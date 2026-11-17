@@ -1,0 +1,33 @@
+name: Build iOS Simulator App
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build for iPhone Simulator
+        run: |
+          xcodebuild \
+            -project Bibodent.xcodeproj \
+            -scheme Bibodent \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Zip the .app
+        run: |
+          cd build/Build/Products/Debug-iphonesimulator
+          zip -r "$GITHUB_WORKSPACE/Bibodent-simulator.zip" Bibodent.app
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Bibodent-simulator
+          path: Bibodent-simulator.zip
