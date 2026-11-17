@@ -1,0 +1,25 @@
+workflows:
+  ios-simulator-build:
+    name: Bibodent iOS Simulator Build
+    instance_type: mac_mini_m2
+    max_build_duration: 30
+    environment:
+      xcode: latest
+    scripts:
+      - name: Build for iPhone Simulator
+        script: |
+          xcodebuild \
+            -project Bibodent.xcodeproj \
+            -scheme Bibodent \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+      - name: Zip the .app
+        script: |
+          cd build/Build/Products/Debug-iphonesimulator
+          zip -r "$CM_BUILD_DIR/Bibodent-simulator.zip" Bibodent.app
+    artifacts:
+      - Bibodent-simulator.zip
